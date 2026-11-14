@@ -103,6 +103,39 @@ body{background:#f7f6fb;color:var(--ink)}.shell{max-width:none;grid-template-col
 .feature-buttons .btn{font-size:11px;padding:10px}
 .bottom button{font-size:8.5px}
 }
+</style><style>
+/* Compact mobile density pass */
+@media(max-width:1000px){
+.mobile-app-header{min-height:calc(52px + env(safe-area-inset-top,0px));padding-top:calc(8px + env(safe-area-inset-top,0px));padding-bottom:8px}
+.mobile-brand{font-size:23px}.mobile-brand small{font-size:7px;margin-top:2px}
+.mobile-account summary{width:36px;height:36px;font-size:20px}
+.sync-banner{min-height:43px;margin-bottom:16px;padding-top:7px;padding-bottom:7px}
+.sync-cloud{font-size:19px}.sync-copy strong{font-size:11px}.sync-banner button{padding:6px 9px;font-size:10px}
+.top{margin-bottom:14px}.top .eyebrow{font-size:8px;margin-bottom:5px}.top h1{font-size:clamp(22px,5.3vw,27px)}.top>.btn{padding:9px 10px;font-size:11px}
+.dashboard-layout{gap:11px}
+.trip-feature{min-height:195px;padding:15px 17px;border-radius:17px}
+.trip-feature-top .feature-tag{font-size:9px;padding:5px 8px}.feature-more{width:29px;height:29px}
+.trip-feature .eyebrow{font-size:8px}.trip-feature h2{font-size:clamp(22px,5.6vw,28px)}.trip-feature p,.feature-dates{font-size:11px}
+.feature-buttons{margin-top:11px;gap:7px}.feature-buttons .btn{font-size:11px;padding:9px 11px}
+.dashboard-layout>.card{padding:15px;min-height:unset;border-radius:16px}
+.dashboard-layout h2{font-size:16px}
+.section-head{margin-bottom:11px}
+.dashboard-weather{min-height:unset}.dashboard-weather .weather{margin-top:5px;gap:9px}.dashboard-weather .weather .temp{font-size:30px}.dashboard-weather .weather .muted{font-size:11px}.dashboard-weather .weather>div:first-child{font-size:32px!important}
+.dashboard-weather .weather-days{display:flex;overflow-x:auto;gap:6px;scroll-snap-type:x proximity;padding-bottom:3px}
+.dashboard-weather .day{flex:0 0 76px;scroll-snap-align:start;border-radius:10px;padding:8px 5px}
+.dashboard-weather .day strong{font-size:10px}.dashboard-weather .day b{font-size:11px}
+.progress-card,.actions-card{min-height:unset}.progress-track{height:9px;margin:13px 0 8px}.progress-card p{font-size:11px}
+.action-grid{margin-top:9px;gap:7px}.action-grid button{padding:9px 3px;font-size:10px;border-radius:10px;gap:2px}.action-grid button span{font-size:20px}
+.preview-card{min-height:unset}.preview-grid{gap:7px}.preview-tile{min-width:77px;max-width:105px;padding:4px}.preview-photo,.preview-icon{height:75px}.preview-empty{padding:12px 0;font-size:12px}
+.bottom{padding-top:4px;padding-bottom:calc(4px + env(safe-area-inset-bottom,0px))}.bottom button{min-height:44px;padding:5px 1px;font-size:9px;gap:2px}.bottom button span{font-size:18px}
+.main{padding-bottom:calc(90px + env(safe-area-inset-bottom,0px))}
+}
+@media(max-width:480px){
+.trip-feature{min-height:185px}
+.dashboard-layout>.card{padding:13px}
+.preview-photo,.preview-icon{height:69px}
+.bottom button{font-size:8.5px}
+}
 </style></head><body><div id="dfs-login-gate" role="region" aria-label="Sign in to DFS"><div class="login-panel"><div class="login-symbol">DFS<span>!</span></div><div class="login-kicker">DON’T FORGET YOUR SHIT.</div><div class="login-art"><div>✈</div><span>YOUR NEXT ADVENTURE STARTS HERE</span></div><h1>Pack your bags.<br><em>Not your worries.</em></h1><p>One place for your trips, outfits and all the stuff you swear you won't forget.</p><form class="email-login" onsubmit="event.preventDefault();window.dfsEmailAction('login')"><label for="login-email">Email address</label><input id="login-email" type="email" autocomplete="email" placeholder="you@example.com" required><label for="login-password">Password</label><input id="login-password" type="password" autocomplete="current-password" placeholder="Your password" required minlength="6"><button id="login-submit" class="login-google" type="submit">Sign in <span>→</span></button></form><div class="auth-links"><button type="button" onclick="window.dfsEmailAction('register')">Create an account</button><button type="button" onclick="window.dfsEmailAction('reset')">Forgot password?</button></div><div id="login-message" class="login-message">Checking your session…</div><small>Private by default · Made for travelling together</small></div></div><div id="app"></div><script>
 function auDate(iso){if(!/^\d{4}-\d{2}-\d{2}$/.test(iso||''))return iso||'';const [y,m,d]=iso.split('-').map(Number);return new Date(Date.UTC(y,m-1,d)).toLocaleDateString('en-AU',{day:'numeric',month:'short',year:'numeric',timeZone:'UTC'});}function auDateRange(start,end){if(!start)return '';if(!end)return auDate(start);if(start.slice(0,7)===end.slice(0,7)){const [y,m,d]=start.split('-').map(Number);return d+'–'+Number(end.slice(8))+' '+new Date(Date.UTC(y,m-1,1)).toLocaleDateString('en-AU',{month:'long',year:'numeric',timeZone:'UTC'});}return auDate(start)+' – '+auDate(end);}
 const KEY='dfs-trip-packer-v1';const id=()=>Math.random().toString(36).slice(2,10);const esc=x=>String(x??'').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));const icons={Clothing:'👕',Shoes:'👟',Toiletries:'🧴',Electronics:'🔌',Documents:'🪪',Health:'🩹',Other:'🧳'};
