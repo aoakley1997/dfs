@@ -59,6 +59,50 @@ body{background:#f7f6fb;color:var(--ink)}.shell{max-width:none;grid-template-col
 }
 @media(max-width:480px){.main{padding-left:14px;padding-right:14px}.mobile-app-header{margin:0 -14px;padding-left:14px;padding-right:14px}.sync-banner{margin-left:-14px;margin-right:-14px;padding-left:14px;padding-right:14px}.top h1{font-size:26px}.top .btn{white-space:nowrap}.wardrobe{gap:8px}.garment-img{height:150px}.dashboard-layout{grid-template-columns:1fr}.dashboard-weather .weather-days{grid-template-columns:repeat(4,minmax(0,1fr))}.action-grid{grid-template-columns:repeat(3,minmax(0,1fr))}.action-grid button{min-width:0;padding:11px 3px}.preview-tile{min-width:85px}.grid .stat strong{font-size:28px}}
 @media(min-width:1001px){.mobile-app-header{display:none}}
+</style><style>
+/* Phone-first refinement: safe areas, visual hierarchy and compact controls */
+@media(max-width:1000px){
+.mobile-app-header{padding-top:calc(14px + env(safe-area-inset-top, 0px));min-height:calc(64px + env(safe-area-inset-top, 0px))}
+.mobile-brand{font-size:25px;letter-spacing:-1.4px;white-space:nowrap}
+.mobile-brand small{font-size:7px;letter-spacing:1.3px}
+.mobile-account summary{width:40px;height:40px}
+.sync-banner{min-height:50px;padding-top:9px;padding-bottom:9px}
+.sync-copy strong{font-size:12px;line-height:1.25;overflow-wrap:anywhere}
+.sync-copy small{display:none}
+.sync-banner button{white-space:nowrap;font-size:11px;padding:8px 10px}
+.top{display:flex;align-items:flex-start;justify-content:space-between;gap:10px;margin:0 0 18px;padding:0}
+.top>div:first-child{min-width:0;flex:1}
+.top .eyebrow{font-size:9px;letter-spacing:1.5px;line-height:1.4;margin-bottom:8px}
+.top h1{font-size:clamp(23px,5.5vw,30px);line-height:1.12;letter-spacing:-1.1px;margin:0}
+.top>.btn{flex-shrink:0;font-size:11px;padding:10px 11px;border-radius:11px;max-width:110px;white-space:normal;line-height:1.15}
+.dashboard-layout{gap:14px}
+.trip-feature{min-height:230px;padding:18px 19px;border-radius:19px}
+.feature-tag{font-size:9px;padding:6px 9px}
+.feature-more{height:32px;width:32px}
+.trip-feature .eyebrow{font-size:9px;letter-spacing:1.4px}
+.trip-feature h2{font-size:clamp(23px,6vw,31px);line-height:1.12;margin:5px 0}
+.trip-feature p,.feature-dates{font-size:12px}
+.feature-buttons{gap:8px;margin-top:14px}
+.feature-buttons .btn{padding:10px 12px;font-size:12px;border-radius:10px}
+.dashboard-layout>.card{padding:17px;border-radius:17px;min-height:unset}
+.dashboard-layout h2{font-size:17px;line-height:1.3}
+.dashboard-weather .section-head{align-items:flex-start;gap:8px}
+.dashboard-weather .section-head h2{overflow-wrap:anywhere}
+.dashboard-weather .weather{margin-top:12px}
+.dashboard-weather .temp{font-size:34px}
+.bottom{padding-top:7px;padding-bottom:calc(7px + env(safe-area-inset-bottom,0px))}
+.bottom button{font-size:9px;letter-spacing:-.15px;line-height:1.12;gap:3px;padding:7px 1px;min-height:52px}
+.bottom button span{font-size:20px}
+.bottom button.active{border-radius:10px}
+}
+@media(max-width:390px){
+.mobile-brand{font-size:23px}
+.top .eyebrow{font-size:8px;letter-spacing:1.1px}
+.top h1{font-size:23px}
+.trip-feature{padding:17px;min-height:218px}
+.feature-buttons .btn{font-size:11px;padding:10px}
+.bottom button{font-size:8.5px}
+}
 </style></head><body><div id="dfs-login-gate" role="region" aria-label="Sign in to DFS"><div class="login-panel"><div class="login-symbol">DFS<span>!</span></div><div class="login-kicker">DON’T FORGET YOUR SHIT.</div><div class="login-art"><div>✈</div><span>YOUR NEXT ADVENTURE STARTS HERE</span></div><h1>Pack your bags.<br><em>Not your worries.</em></h1><p>One place for your trips, outfits and all the stuff you swear you won't forget.</p><form class="email-login" onsubmit="event.preventDefault();window.dfsEmailAction('login')"><label for="login-email">Email address</label><input id="login-email" type="email" autocomplete="email" placeholder="you@example.com" required><label for="login-password">Password</label><input id="login-password" type="password" autocomplete="current-password" placeholder="Your password" required minlength="6"><button id="login-submit" class="login-google" type="submit">Sign in <span>→</span></button></form><div class="auth-links"><button type="button" onclick="window.dfsEmailAction('register')">Create an account</button><button type="button" onclick="window.dfsEmailAction('reset')">Forgot password?</button></div><div id="login-message" class="login-message">Checking your session…</div><small>Private by default · Made for travelling together</small></div></div><div id="app"></div><script>
 function auDate(iso){if(!/^\d{4}-\d{2}-\d{2}$/.test(iso||''))return iso||'';const [y,m,d]=iso.split('-').map(Number);return new Date(Date.UTC(y,m-1,d)).toLocaleDateString('en-AU',{day:'numeric',month:'short',year:'numeric',timeZone:'UTC'});}function auDateRange(start,end){if(!start)return '';if(!end)return auDate(start);if(start.slice(0,7)===end.slice(0,7)){const [y,m,d]=start.split('-').map(Number);return d+'–'+Number(end.slice(8))+' '+new Date(Date.UTC(y,m-1,1)).toLocaleDateString('en-AU',{month:'long',year:'numeric',timeZone:'UTC'});}return auDate(start)+' – '+auDate(end);}
 const KEY='dfs-trip-packer-v1';const id=()=>Math.random().toString(36).slice(2,10);const esc=x=>String(x??'').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));const icons={Clothing:'👕',Shoes:'👟',Toiletries:'🧴',Electronics:'🔌',Documents:'🪪',Health:'🩹',Other:'🧳'};
