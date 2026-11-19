@@ -273,6 +273,27 @@ body{background:#f7f6fb;color:var(--ink)}.shell{max-width:none;grid-template-col
 .dfs-photo-edit{border:1px solid #ac93cd;background:#6d538d;color:#fff;border-radius:10px;min-height:42px;padding:9px 18px;font-weight:800}
 .dfs-photo-viewer-content{padding-top:16px}
 
+/* Recovery is visible from Wardrobe, without exposing archived clothing in
+   normal packing totals or silently changing saved packing decisions. */
+.wardrobe-recovery{position:relative;z-index:3;background:#fff;border:1px solid #e5deed;border-radius:14px;padding:12px 14px;margin:0 0 14px;display:flex;justify-content:space-between;gap:10px;align-items:center}
+.wardrobe-recovery-intro{display:flex;flex-direction:column;gap:2px;min-width:0}
+.wardrobe-recovery-intro strong{color:#3c2f4e;font-size:14px}
+.wardrobe-recovery-intro span{color:#81758b;font-size:12px;line-height:1.4}
+.wardrobe-recovery-tools{display:flex;align-items:center;gap:6px;flex-wrap:wrap}
+.wardrobe-recovery-tools .recovery-all,.recovery-details summary{white-space:nowrap;appearance:none;list-style:none;display:flex;align-items:center;justify-content:center;min-height:37px;padding:8px 10px;border-radius:9px;border:1px solid #e5dcf0;background:#f5f0fa;color:#5e4b78;font-size:12px;font-weight:800;cursor:pointer}
+.recovery-details summary::-webkit-details-marker{display:none}
+.recovery-details[open] summary{background:#ddd0ee;border-color:#bfaddb}
+.recovery-popout{position:absolute;left:8px;right:8px;top:calc(100% + 4px);z-index:11;max-height:260px;overflow:auto;background:#fff;border:1px solid #e5dced;border-radius:12px;padding:9px;box-shadow:0 14px 32px #25183025}
+.recovery-popout p{font-size:13px;color:#786b84;padding:7px;margin:0}
+.recovery-item{display:flex;align-items:center;gap:10px;padding:8px 5px;border-bottom:1px solid #eee9f3}
+.recovery-item:last-child{border-bottom:0}
+.recovery-thumb{width:43px;height:43px;flex-shrink:0;display:grid;place-items:center;overflow:hidden;background:#f3eef9;border-radius:9px;font-size:24px}
+.recovery-thumb img{width:100%;height:100%;object-fit:contain}
+.recovery-description{flex:1;min-width:0;display:flex;flex-direction:column;gap:3px}
+.recovery-description strong{font-size:13px;color:#382e45;overflow-wrap:anywhere}
+.recovery-description small{font-size:12px;color:#7e7487}
+.recovery-item button{border:0;background:#856fac;color:#fff;min-height:35px;padding:6px 11px;border-radius:9px;font-weight:800;font-size:12px}
+
 @media(max-width:1000px){
  .pack-section .items{grid-template-columns:1fr;gap:7px}
  .pack-heading,.wardrobe-heading{margin-bottom:10px}
@@ -289,6 +310,10 @@ body{background:#f7f6fb;color:var(--ink)}.shell{max-width:none;grid-template-col
  .garment-actions{gap:5px}
  .garment-actions button{font-size:10.5px;min-height:37px;padding:7px 4px}
  .garment-photo-hint{font-size:9px;bottom:6px;right:6px}
+ .wardrobe-recovery{align-items:stretch;flex-direction:column;padding:11px 12px;margin-bottom:12px}
+ .wardrobe-recovery-tools{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:6px}
+ .wardrobe-recovery-tools .recovery-all,.recovery-details summary{font-size:11px;min-height:37px;white-space:normal;text-align:center}
+ .wardrobe-recovery-tools .recovery-all{grid-column:1 / -1}
 }
 @media(max-width:390px){
  .pack-item .packing-thumb{width:36px;height:36px;min-width:36px}
@@ -434,12 +459,32 @@ function packing() {
 
 function wardrobe() {
   const all = scoped(trip().clothes);
+  const archived = trip().clothes.filter(x => x.deletedAt);
+  const otherTrips = db.trips.filter(t => t.id !== trip().id && (t.clothes || []).some(x => !x.deletedAt));
   const cats = ['All', ...clothingCategories, 'Clothing'];
   const shown = all.filter(x => wardrobeCategory === 'All' || x.category === wardrobeCategory);
   const excludedCount = all.filter(x => !clothingPackingItem(x.id) || clothingPackingItem(x.id).notPacking).length;
   return `${tabsPeople(false)}
     <div class="section-head wardrobe-heading"><div><h2>My wardrobe</h2><div class="muted">${all.length} pieces · ${excludedCount} not packing</div></div>
     <button class="btn" onclick="openModal('clothing')">+ Add clothing</button></div>
+    <div class="wardrobe-recovery">
+      <div class="wardrobe-recovery-intro"><strong>Missing something?</strong><span>Show every item or restore clothes that were removed.</span></div>
+      <div class="wardrobe-recovery-tools">
+        <button type="button" class="recovery-all" onclick="showAllClothes()">Show all clothes</button>
+        <details class="recovery-details"><summary>Recently deleted (${archived.length})</summary>
+          <div class="recovery-popout">${archived.length ? archived.map(c => `<div class="recovery-item">
+            <div class="recovery-thumb">${c.photo ? `<img src="${esc(c.photo)}" alt="">` : '👕'}</div>
+            <div class="recovery-description"><strong>${esc(c.name)}</strong><small>${esc(pName(c.owner))} · ${esc(c.category)}</small></div>
+            <button type="button" onclick="restoreClothingFromWardrobe('${c.id}')">Restore</button>
+          </div>`).join('') : '<p>No deleted clothes in this trip.</p>'}</div>
+        </details>
+        ${otherTrips.length ? `<details class="recovery-details"><summary>Other trips (${otherTrips.length})</summary>
+          <div class="recovery-popout">${otherTrips.map(t => `<div class="recovery-item">
+            <div class="recovery-description"><strong>${esc(t.name)}</strong><small>${t.clothes.filter(c => !c.deletedAt).length} clothing items</small></div>
+            <button type="button" onclick="switchTrip('${t.id}')">Open trip</button>
+          </div>`).join('')}</div></details>` : ''}
+      </div>
+    </div>
     <div class="wardrobe-filters">${cats.map(c => `<button class="filter ${wardrobeCategory === c ? 'active' : ''}" onclick="wardrobeCategory='${c}';render()">${c}</button>`).join('')}</div>
     ${shown.length ? `<div class="wardrobe">${shown.map(c => {
       const p = clothingPackingItem(c.id);
@@ -460,6 +505,36 @@ function wardrobe() {
         </div>
       </article>`;
     }).join('')}</div>` : '<div class="empty"><strong>Start your wardrobe</strong><p>Add your clothes and their photos. Everything stays here even when you choose not to pack it.</p><button class="btn" onclick="openModal(\'clothing\')">+ Add clothing</button></div>'}`;
+}
+
+function showAllClothes() {
+  person = 'all';
+  wardrobeCategory = 'All';
+  render();
+}
+
+function restoreClothingFromWardrobe(clothingId) {
+  const c = trip().clothes.find(x => x.id === clothingId && x.deletedAt);
+  if (!c) return;
+  delete c.deletedAt;
+  for (const p of trip().items.filter(x => x.wardrobeId === clothingId)) {
+    delete p.deletedAt;
+    p.notPacking = true;
+    p.packed = false;
+  }
+  person = 'all';
+  wardrobeCategory = 'All';
+  if (save()) notify('Clothing restored — choose Take it when you want to pack it');
+  else render();
+}
+
+function restoreDeleted(kind, itemId) {
+  if (kind === 'clothes') return restoreClothingFromWardrobe(itemId);
+  const x = trip()[kind]?.find(x => x.id === itemId);
+  if (!x) return;
+  delete x.deletedAt;
+  if (save()) notify('Item restored');
+  else render();
 }
 
 function showClothingPhoto(photo, name, garmentId = '') {
