@@ -214,11 +214,100 @@ body{background:#f7f6fb;color:var(--ink)}.shell{max-width:none;grid-template-col
 .dfs-photo-viewer img{display:block;max-width:100%;max-height:75dvh;object-fit:contain;border-radius:14px}
 .dfs-photo-viewer p{color:#fff;font-weight:700;text-align:center;margin:0}
 .dfs-photo-close{position:absolute;right:0;top:-52px;background:#4e425e;color:#fff;border:1px solid #8b779d;border-radius:50%;width:42px;height:42px;font-size:29px;line-height:1;cursor:pointer}
+</style><style>
+/* Clear packing choices: active checklist vs. reversible Not packing. */
+.pack-heading,.wardrobe-heading{margin-bottom:14px}
+.pack-switch{display:flex;gap:5px;padding:5px;background:#ece7f4;border:1px solid #e3dbed;border-radius:14px;margin:0 0 21px;max-width:430px}
+.pack-switch button{flex:1;border:0;background:transparent;color:#665c76;font-weight:800;font-size:13px;min-height:41px;padding:7px 9px;border-radius:10px}
+.pack-switch button.active{background:#fff;color:#4c356d;box-shadow:0 2px 9px #3e294b18}
+.pack-switch span{display:inline-block;margin-left:6px;min-width:21px;padding:1px 5px;background:#ded4eb;border-radius:30px;font-size:11px}
+.pack-switch button.active span{background:#ede2fb}
+.pack-section{margin-top:19px}
+.pack-section .section-head{margin-bottom:9px}
+.pack-section .items{grid-template-columns:repeat(2,minmax(0,1fr));gap:8px}
+.pack-item{display:flex;min-width:0;gap:9px;min-height:64px;padding:9px 10px;background:#fff;border:1px solid #e8e3ee;border-radius:13px;box-shadow:0 2px 9px #36294707}
+.pack-item .tick,.pack-paused{width:28px;height:28px;min-width:28px;border-radius:9px;flex:0 0 28px}
+.pack-item .tick{border:1.5px solid #b9adca}
+.pack-item .tick.checked{border-color:#7863a5;background:#7863a5}
+.pack-paused{display:grid;place-items:center;background:#f0edf3;color:#8b8293;font-size:22px}
+.pack-item .packing-thumb{width:42px;height:42px;min-width:42px;border-radius:9px}
+.pack-details{flex:1;min-width:0;text-align:left;padding:0;border:0;background:transparent;color:#2b2437;display:flex;flex-direction:column;justify-content:center;gap:3px;cursor:pointer}
+.pack-details strong{font-size:14px;line-height:1.25;white-space:normal;overflow-wrap:anywhere;font-weight:800}
+.pack-details span{color:#888092;font-size:11px;line-height:1.3;overflow-wrap:anywhere}
+.pack-item.is-packed .pack-details strong{text-decoration:line-through;color:#8b8592;font-weight:650}
+.pack-state-button{flex-shrink:0;align-self:center;min-height:35px;border-radius:10px;background:#f7f4fa;color:#6f5a85;border:1px solid #e5dced;font-size:11px;font-weight:800;padding:7px 9px}
+.pack-state-button.restore{background:#e8f4ee;border-color:#cce7d8;color:#216447}
+.pack-state-button:hover,.pack-state-button:focus-visible{background:#eee5f8}
+.pack-state-button.restore:hover,.pack-state-button.restore:focus-visible{background:#d7ecdf}
+.pack-footer{display:flex;gap:9px;flex-wrap:wrap;margin-top:24px}
+.pack-footer .btn{font-size:12px}
+.packing-empty{margin-top:9px}
+.packing-empty strong{display:block;color:#463755;font-size:17px}
+.packing-empty p{margin:7px 0 14px}
+
+/* Photo-led wardrobe cards with a clear status and only the useful actions. */
+.wardrobe{gap:13px}
+.wardrobe .garment{border-radius:17px;overflow:hidden;box-shadow:0 3px 12px #3020430a;border:1px solid #e8e1ef;transition:box-shadow .15s}
+.wardrobe .garment:hover{transform:none;box-shadow:0 7px 20px #30204313}
+.garment-photo-button{appearance:none;border:0;position:relative;display:block;width:100%;padding:0;cursor:zoom-in;text-align:center;background:#f2eff7;color:#74618b}
+.garment-photo-button:focus-visible{outline:3px solid #9e7cd0;outline-offset:-3px}
+.garment-photo-button img{display:block;width:100%;height:100%;object-fit:contain;padding:10px}
+.garment-photo-button .photo-placeholder{width:100%;height:100%;display:flex;flex-direction:column;align-items:center;justify-content:center}
+.garment-photo-button .garment-chip{left:9px;top:9px;font-size:10px;padding:5px 8px;background:#ffffffed;color:#65527c}
+.garment-photo-hint{position:absolute;bottom:8px;right:8px;border-radius:7px;background:#33283ec9;color:#fff;font-size:10px;font-weight:750;padding:4px 7px}
+.garment-body{display:flex;flex-direction:column;gap:4px;padding:12px}
+.garment-title{display:flex;align-items:start;justify-content:space-between;gap:5px}
+.garment-title b{font-size:14px;font-weight:850;line-height:1.25;overflow-wrap:anywhere;min-width:0}
+.garment-title button{border:0;background:#f2edf8;border-radius:8px;min-width:28px;min-height:28px;color:#685681;font-size:16px;line-height:1}
+.garment-body>small{font-size:11px;color:#81788c}
+.garment-status{align-self:flex-start;padding:3px 8px;border-radius:99px;font-size:11px;font-weight:800;line-height:1.35;margin-top:4px}
+.status-to-pack{color:#705291;background:#f1e9f9}
+.status-packed{color:#25644d;background:#e0f2e9}
+.status-excluded{color:#786d80;background:#f1eef3}
+.garment-excluded .garment-photo-button img{opacity:.86}
+.garment-actions{display:flex;gap:7px;margin-top:7px;flex-wrap:nowrap;align-items:stretch}
+.garment-actions button{flex:1 1 0;min-width:0;border:0;border-radius:9px;padding:9px 5px;min-height:38px;line-height:1.15;font-size:11px;font-weight:800}
+.garment-action-primary{background:#8570af;color:#fff}
+.garment-action-secondary{background:#f3eef9;color:#66507c;border:1px solid #e9e0f3!important}
+.garment-excluded .garment-action-primary{background:#e3f2e9;color:#276448}
+.dfs-photo-edit{border:1px solid #ac93cd;background:#6d538d;color:#fff;border-radius:10px;min-height:42px;padding:9px 18px;font-weight:800}
+.dfs-photo-viewer-content{padding-top:16px}
+
+@media(max-width:1000px){
+ .pack-section .items{grid-template-columns:1fr;gap:7px}
+ .pack-heading,.wardrobe-heading{margin-bottom:10px}
+ .pack-switch{margin-bottom:13px;max-width:none}
+ .pack-switch button{font-size:12px;min-height:38px}
+ .pack-item{min-height:62px;padding:8px 9px;gap:8px;border-radius:12px}
+ .pack-details strong{font-size:13px}
+ .pack-details span{font-size:10.5px}
+ .pack-state-button{font-size:11px;min-height:34px;padding:6px 8px}
+ .wardrobe{grid-template-columns:repeat(2,minmax(0,1fr));gap:10px}
+ .garment-photo-button{height:147px}
+ .garment-body{padding:10px;gap:3px}
+ .garment-title b{font-size:13px}
+ .garment-actions{gap:5px}
+ .garment-actions button{font-size:10.5px;min-height:37px;padding:7px 4px}
+ .garment-photo-hint{font-size:9px;bottom:6px;right:6px}
+}
+@media(max-width:390px){
+ .pack-item .packing-thumb{width:36px;height:36px;min-width:36px}
+ .pack-item .tick,.pack-paused{width:26px;height:26px;min-width:26px;flex-basis:26px}
+ .pack-item{gap:6px;padding:8px 7px}
+ .pack-state-button{padding:6px;font-size:10px}
+ .garment-photo-button{height:126px}
+ .garment-body{padding:9px}
+ .garment-actions button{font-size:10px}
+}
+@media print{
+ .pack-switch,.pack-state-button,.pack-footer,.garment-photo-hint{display:none!important}
+ .pack-item{break-inside:avoid}
+}
 </style></head><body><div id="dfs-login-gate" role="region" aria-label="Sign in to DFS"><div class="login-panel"><div class="login-symbol">DFS<span>!</span></div><div class="login-kicker">DON’T FORGET YOUR SHIT.</div><div class="login-art"><div>✈</div><span>YOUR NEXT ADVENTURE STARTS HERE</span></div><h1>Pack your bags.<br><em>Not your worries.</em></h1><p>One place for your trips, outfits and all the stuff you swear you won't forget.</p><form class="email-login" onsubmit="event.preventDefault();window.dfsEmailAction('login')"><label for="login-email">Email address</label><input id="login-email" type="email" autocomplete="email" placeholder="you@example.com" required><label for="login-password">Password</label><input id="login-password" type="password" autocomplete="current-password" placeholder="Your password" required minlength="6"><button id="login-submit" class="login-google" type="submit">Sign in <span>→</span></button></form><div class="auth-links"><button type="button" onclick="window.dfsEmailAction('register')">Create an account</button><button type="button" onclick="window.dfsEmailAction('reset')">Forgot password?</button></div><div id="login-message" class="login-message">Checking your session…</div><small>Private by default · Made for travelling together</small></div></div><div id="app"></div><script>
 function auDate(iso){if(!/^\d{4}-\d{2}-\d{2}$/.test(iso||''))return iso||'';const [y,m,d]=iso.split('-').map(Number);return new Date(Date.UTC(y,m-1,d)).toLocaleDateString('en-AU',{day:'numeric',month:'short',year:'numeric',timeZone:'UTC'});}function auDateRange(start,end){if(!start)return '';if(!end)return auDate(start);if(start.slice(0,7)===end.slice(0,7)){const [y,m,d]=start.split('-').map(Number);return d+'–'+Number(end.slice(8))+' '+new Date(Date.UTC(y,m-1,1)).toLocaleDateString('en-AU',{month:'long',year:'numeric',timeZone:'UTC'});}return auDate(start)+' – '+auDate(end);}
 const KEY='dfs-trip-packer-v1';const id=()=>Math.random().toString(36).slice(2,10);const esc=x=>String(x??'').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));const icons={Clothing:'👕',Shoes:'👟',Toiletries:'🧴',Electronics:'🔌',Documents:'🪪',Health:'🩹',Other:'🧳'};
 const starter=['T-shirts|Clothing','Underwear|Clothing','Socks|Clothing','Sleepwear|Clothing','Shorts / trousers|Clothing','Jacket / jumper|Clothing','Walking shoes|Shoes','Toothbrush|Toiletries','Toothpaste|Toiletries','Deodorant|Toiletries','Skincare|Toiletries','Phone charger|Electronics','Travel documents|Documents','Medication|Health'].map(s=>{let [name,category]=s.split('|');return {id:id(),name,category,qty:1,packed:false,owner:'person'}});let db;try{db=JSON.parse(localStorage.getItem(KEY))}catch{}if(!db||!Array.isArray(db.trips))db={trips:[{id:id(),name:'My next getaway',destination:'',start:'',end:'',people:[{id:id(),name:'Traveller 1'}],items:[],clothes:[],outfits:[]}],active:null};if(!db.active||!db.trips.some(t=>t.id===db.active))db.active=db.trips[0].id;
-const clothingCategories=['Top','Bottom','Dress','Shorts','Jacket','Shoes','Swimwear','Underwear','Accessories','Sleepwear','Other'];let locationMatches=[],locationTimer=null,selectedLocation=null,wardrobeCategory="All";let weatherKey='',weatherLastAttempt=0;let toastMessage='',toastTimer=null;let tab='dashboard',person='all',modal='',weather=null,weatherError='',weatherLoading=false;const trip=()=>db.trips.find(t=>t.id===db.active);const save=()=>{if(!window.dfsCloudReady?.()){alert('Cloud is still loading. Please wait before editing.');return false}return window.dfsCloudSave()};function notify(msg='Saved successfully'){toastMessage=msg;clearTimeout(toastTimer);render();toastTimer=setTimeout(()=>{toastMessage='';render()},2800)};const people=()=>trip().people;const pName=pid=>pid==='shared'?'Shared':people().find(p=>p.id===pid)?.name||'Unknown';const personOptions=(shared=true)=>people().map(p=>`<option value="${p.id}">${esc(p.name)}</option>`).join('')+(shared?'<option value="shared">Shared essentials</option>':'');const scoped=arr=>arr.filter(x=>!x.deletedAt&&(person==='all'||x.owner===person));const count=()=>{let a=trip().items.filter(x=>!x.deletedAt);return [a.filter(x=>x.packed).length,a.length]};const navs=[['dashboard','⌂','Home'],['packing','☑','Packing lists'],['wardrobe','♧','Wardrobe'],['outfits','✧','Outfits'],['settings','⚙','Trips & settings']];
+const clothingCategories=['Top','Bottom','Dress','Shorts','Jacket','Shoes','Swimwear','Underwear','Accessories','Sleepwear','Other'];let locationMatches=[],locationTimer=null,selectedLocation=null,wardrobeCategory="All";let weatherKey='',weatherLastAttempt=0;let toastMessage='',toastTimer=null;let tab='dashboard',person='all',modal='',weather=null,weatherError='',weatherLoading=false;const trip=()=>db.trips.find(t=>t.id===db.active);const save=()=>{if(!window.dfsCloudReady?.()){alert('Cloud is still loading. Please wait before editing.');return false}return window.dfsCloudSave()};function notify(msg='Saved successfully'){toastMessage=msg;clearTimeout(toastTimer);render();toastTimer=setTimeout(()=>{toastMessage='';render()},2800)};const people=()=>trip().people;const pName=pid=>pid==='shared'?'Shared':people().find(p=>p.id===pid)?.name||'Unknown';const personOptions=(shared=true)=>people().map(p=>`<option value="${p.id}">${esc(p.name)}</option>`).join('')+(shared?'<option value="shared">Shared essentials</option>':'');const scoped=arr=>arr.filter(x=>!x.deletedAt&&(person==='all'||x.owner===person));const count=()=>{let a=trip().items.filter(x=>!x.deletedAt&&!x.notPacking);return [a.filter(x=>x.packed).length,a.length]};const navs=[['dashboard','⌂','Home'],['packing','☑','Packing lists'],['wardrobe','♧','Wardrobe'],['outfits','✧','Outfits'],['settings','⚙','Trips & settings']];
 function render(){const t=trip(),[done,total]=count(),pct=total?Math.round(done/total*100):0;document.getElementById('app').innerHTML=`<div class="shell"><aside class="sidebar"><div class="logo">DFS<span>!</span> <span class="logo-plane">✈</span></div><div class="brand-subtitle">Don’t Forget Your Shit!</div><nav>${navs.map(n=>`<button class="nav ${tab===n[0]?'active':''}" onclick="go('${n[0]}')">${n[1]} &nbsp; ${n[2]}</button>`).join('')}</nav><div id="firebase-status"></div><button class="legacy-import" type="button" onclick="window.dfsImportLegacy()">Import older browser trips</button><div class="sidebar-footer"><div class="sidebar-decor">✈︎</div><div class="note">Cloud sync is enabled for this account.<br>Weather powered by Open-Meteo.</div></div></aside><main class="main"><div class="mobile-app-header"><div class="mobile-brand">DFS<span>!</span><small>DON’T FORGET YOUR SHIT</small></div><details class="mobile-account"><summary aria-label="Open account menu">☰</summary><div class="mobile-account-menu"><div class="mobile-account-title">My account</div><div class="mobile-email" id="mobile-email">Signed in</div><button onclick="openModal('trips');document.querySelector('.mobile-account')?.removeAttribute('open')">⇄ Switch trip</button><button onclick="window.dfsImportLegacy()">↥ Import older trips</button><button onclick="exportData()">↓ Download backup</button><button onclick="window.dfsSignOut()">↪ Sign out</button></div></details></div><div class="sync-banner"><span class="sync-cloud">☁</span><div class="sync-copy"><strong id="dfs-sync-state">Checking cloud…</strong><small>Account changes and backups</small></div><button type="button" onclick="exportData()">↓ Backup</button></div><div class="top"><div><div class="eyebrow">PACK TOGETHER. FORGET NOTHING.</div><h1>${({dashboard:'Ready for your next adventure?',packing:'Packing lists',wardrobe:'Your wardrobe',outfits:'Outfit planner',settings:'Trips & settings'})[tab]}</h1></div><button class="btn ghost" onclick="newTrip()">+ New trip</button></div>${tab==='dashboard'?dashboard():tab==='packing'?packing():tab==='wardrobe'?wardrobe():tab==='outfits'?outfits():settings()}</main><div class="bottom">${navs.map(n=>`<button class="${tab===n[0]?'active':''}" onclick="go('${n[0]}')" aria-label="${n[2]}" ${tab===n[0]?'aria-current="page"':''}><span>${n[1]}</span>${n[2]}</button>`).join('')}</div></div>${modal?modalHTML():''}${toastMessage?`<div class="save-toast" role="status">✓ ${esc(toastMessage)}</div>`:''}`}
 const dfsOriginalRender=render;render=function(){if(!window.dfsCloudReady?.()){document.getElementById('app').innerHTML='';return}dfsOriginalRender();window.dfsDrawAuth?.();document.getElementById('dfs-sync-state')?.replaceChildren(document.createTextNode(window.dfsCloudState?.()||'Checking cloud…'));const email=document.getElementById('mobile-email');if(email)email.textContent=window.dfsCurrentUser?.()?.email||'Signed in'};
 function go(x){tab=x;render();if(x==='dashboard')scheduleWeather()}function pickPerson(x){person=x;render()}function tabsPeople(shared=true){return `<div class="travellers"><button class="traveller ${person==='all'?'active':''}" onclick="pickPerson('all')">Everyone</button>${people().map(p=>`<button class="traveller ${person===p.id?'active':''}" onclick="pickPerson('${p.id}')"><span class="avatar">${esc(p.name.slice(0,1).toUpperCase())}</span>${esc(p.name)}</button>`).join('')}${shared?`<button class="traveller ${person==='shared'?'active':''}" onclick="pickPerson('shared')">✦ Shared</button>`:''}</div>`}
@@ -254,8 +343,179 @@ if(type==='clothing')body=`<div class="fields"><label class="field">Clothing nam
 if(type==='person')body=`<label class="field">Traveller name<input id="name" value="${esc(x?.name||'')}" placeholder="e.g. Alex"></label>`;
 if(type==='outfit'){let clothes=t.clothes.filter(c=>!c.deletedAt&&c.owner===(x?.owner||people()[0].id));body=`<div class="fields"><label class="field">Outfit name<input id="name" value="${esc(x?.name||'')}" placeholder="e.g. Dinner out"></label>${ownerField(x,false)}<label class="field">Occasion<input id="occasion" value="${esc(x?.occasion||'')}" placeholder="e.g. Sightseeing"></label>${['top','bottom','shoes'].map(k=>`<label class="field">${k[0].toUpperCase()+k.slice(1)}<select id="${k}"><option value="">None</option>${clothes.map(c=>`<option value="${c.id}" ${x?.[k]===c.id?'selected':''}>${esc(c.name)} (${esc(pName(c.owner))})</option>`).join('')}</select></label>`).join('')}</div><p class="note">For outfits, add clothing photos to the wardrobe first. Change traveller and reopen this form to see their clothing.</p>`}
 if(type==='trips')body=`<div style="display:grid;gap:9px">${db.trips.map(a=>`<div class="item"><div class="details"><b>${esc(a.name)}</b><small>${esc(a.destination||'No destination')}</small></div><button class="btn soft small" onclick="switchTrip('${a.id}')">Open</button><button class="iconbtn" onclick="deleteTrip('${a.id}')">×</button></div>`).join('')}</div><div class="section"><button class="btn" onclick="newTrip()">+ New trip</button> <button class="btn ghost" onclick="duplicateTrip()">Duplicate current</button></div>`;
-return `<div class="modalbg" onclick="if(event.target===this)closeModal()"><div class="modal"><div class="section-head"><h2>${({item:i?'Edit item':'Add packing item',clothing:i?'Edit clothing':'Add clothing',person:i?'Edit traveller':'Add traveller',outfit:i?'Edit outfit':'Create outfit',trips:'Your trips'})[type]}</h2><button class="iconbtn" onclick="closeModal()">✕</button></div>${body}${type!=='trips'?`<footer><button class="btn ghost" onclick="closeModal()">Cancel</button><button class="btn" onclick="submitModal()">Save</button></footer>`:''}</div></div>`}
-async function submitModal(){let {type,id:i}=modal,t=trip(),name=val('name').trim();if(!name)return alert('Please enter a name.');if(type==='person'){let x=t.people.find(x=>x.id===i);if(x)x.name=name;else t.people.push({id:id(),name})}else{let k={item:'items',clothing:'clothes',outfit:'outfits'}[type],x=t[k].find(x=>x.id===i),obj={...(x||{}),id:i||id(),name,owner:val('owner')||people()[0].id};if(type==='item'){obj.category=val('category');obj.qty=Math.max(1,Number(val('qty'))||1);obj.packed=x?.packed||false;const linked=val('wardrobeLink');if(linked){const c=t.clothes.find(c=>c.id===linked&&!c.deletedAt);if(c){obj.wardrobeId=c.id;obj.name=c.name;obj.owner=c.owner;obj.category='Clothing'}}else if(document.getElementById('addToWardrobe')?.checked){ensureWardrobeForPacking(obj,'Other');obj.category='Clothing'}else if(x?.wardrobeId){delete obj.wardrobeId}}if(type==='clothing'){obj.category=val('category');let f=document.getElementById('photo').files[0];if(f){try{obj.photo=await shrink(f)}catch(e){return alert('Could not read photo')}}}if(type==='outfit'){obj.occasion=val('occasion');for(let v of ['top','bottom','shoes'])obj[v]=val(v)}if(x)Object.assign(x,obj);else t[k].push(obj);if(type==='clothing'){ensurePackingForClothing(obj);syncLinkedPacking(obj)}if(type==='item'&&obj.wardrobeId){const c=t.clothes.find(c=>c.id===obj.wardrobeId);if(c){obj.name=c.name;obj.owner=c.owner;obj.category='Clothing';const duplicate=t.items.find(p=>p.id!==obj.id&&p.wardrobeId===c.id&&!p.deletedAt);if(duplicate){if(x){x.deletedAt=new Date().toISOString()}else{t.items=t.items.filter(p=>p.id!==obj.id)}duplicate.qty=obj.qty;duplicate.packed=obj.packed}else if(x){Object.assign(x,obj)}}}}if(save()){modal='';notify(type==='person'?'Traveller saved':type==='item'?'Packing item saved':type==='clothing'?'Wardrobe item saved':'Outfit saved')}else closeModal()}
+return `<div class="modalbg" onclick="if(event.target===this)closeModal()"><div class="modal"><div class="section-head"><h2>${({item:i?'Edit item':'Add packing item',clothing:i?'Edit clothing':'Add clothing',person:i?'Edit traveller':'Add traveller',outfit:i?'Edit outfit':'Create outfit',trips:'Your trips'})[type]}</h2><button class="iconbtn" onclick="closeModal()">✕</button></div>${body}${type!=='trips'?`<footer>${type==='item'&&i?`<button class="btn danger" onclick="deletePackingFromModal('${i}')">Delete item</button>`:''}${type==='clothing'&&i?`<button class="btn danger" onclick="deleteClothingFromModal('${i}')">Delete clothing</button>`:''}<button class="btn ghost" onclick="closeModal()">Cancel</button><button class="btn" onclick="submitModal()">Save</button></footer>`:''}</div></div>`}
+async function submitModal(){let {type,id:i}=modal,t=trip(),name=val('name').trim();if(!name)return alert('Please enter a name.');if(type==='person'){let x=t.people.find(x=>x.id===i);if(x)x.name=name;else t.people.push({id:id(),name})}else{let k={item:'items',clothing:'clothes',outfit:'outfits'}[type],x=t[k].find(x=>x.id===i),obj={...(x||{}),id:i||id(),name,owner:val('owner')||people()[0].id};if(type==='item'){obj.category=val('category');obj.qty=Math.max(1,Number(val('qty'))||1);obj.packed=x?.packed||false;const linked=val('wardrobeLink');if(linked){const c=t.clothes.find(c=>c.id===linked&&!c.deletedAt);if(c){obj.wardrobeId=c.id;obj.name=c.name;obj.owner=c.owner;obj.category='Clothing'}}else if(document.getElementById('addToWardrobe')?.checked){ensureWardrobeForPacking(obj,'Other');obj.category='Clothing'}else if(x?.wardrobeId){delete obj.wardrobeId}}if(type==='clothing'){obj.category=val('category');let f=document.getElementById('photo').files[0];if(f){try{obj.photo=await shrink(f)}catch(e){return alert('Could not read photo')}}}if(type==='outfit'){obj.occasion=val('occasion');for(let v of ['top','bottom','shoes'])obj[v]=val(v)}if(x)Object.assign(x,obj);else t[k].push(obj);if(type==='clothing'){ensurePackingForClothing(obj);syncLinkedPacking(obj)}if(type==='item'&&obj.wardrobeId){const c=t.clothes.find(c=>c.id===obj.wardrobeId);if(c){obj.name=c.name;obj.owner=c.owner;obj.category='Clothing';const duplicate=t.items.find(p=>p.id!==obj.id&&p.wardrobeId===c.id&&!p.deletedAt);if(duplicate){if(x){x.deletedAt=new Date().toISOString()}else{t.items=t.items.filter(p=>p.id!==obj.id)}duplicate.qty=obj.qty;duplicate.packed=obj.packed;duplicate.notPacking=false}else if(x){Object.assign(x,obj)}}}}if(save()){modal='';notify(type==='person'?'Traveller saved':type==='item'?'Packing item saved':type==='clothing'?'Wardrobe item saved':'Outfit saved')}else closeModal()}
 function shrink(file){return new Promise((resolve,reject)=>{let reader=new FileReader();reader.onload=()=>{let im=new Image();im.onload=()=>{let c=document.createElement('canvas'),scale=Math.min(1,800/Math.max(im.width,im.height));c.width=Math.round(im.width*scale);c.height=Math.round(im.height*scale);c.getContext('2d').drawImage(im,0,0,c.width,c.height);resolve(c.toDataURL('image/jpeg',.7))};im.onerror=reject;im.src=reader.result};reader.onerror=reject;reader.readAsDataURL(file)})}
-function switchTrip(i){db.active=i;person='all';weather=null;weatherKey='';if(save()){modal='';notify('Trip opened');scheduleWeather(true)}else render()}function newTrip(){let t={id:id(),name:'New trip',destination:'',start:'',end:'',people:[{id:id(),name:'Traveller 1'}],items:[],clothes:[],outfits:[]};db.trips.push(t);switchTrip(t.id);go('settings')}function duplicateTrip(){let t=structuredClone(trip());t.id=id();t.name+=' (copy)';t.items.forEach(x=>x.packed=false);db.trips.push(t);switchTrip(t.id)}function deleteTrip(i){if(db.trips.length<2)return alert('Keep at least one trip.');if(!confirm('Archive this trip? A backup will download first.'))return;exportData();db.trips=db.trips.filter(x=>x.id!==i);if(db.active===i)db.active=db.trips[0].id;save();render()}function exportData(){let b=new Blob([JSON.stringify(db,null,2)],{type:'application/json'}),a=document.createElement('a');a.href=URL.createObjectURL(b);a.download='dfs-packing-backup.json';a.click();URL.revokeObjectURL(a.href)}async function importData(el){let f=el.files[0];if(!f)return;try{let v=JSON.parse(await f.text());if(!Array.isArray(v.trips)||!v.trips.length)throw Error();if(confirm('Replace your existing trips with this backup?')){db=v;db.active=db.trips.some(t=>t.id===v.active)?v.active:db.trips[0].id;save();render()}}catch{alert('Invalid backup file')}}render();scheduleWeather();
+function switchTrip(i){db.active=i;person='all';weather=null;weatherKey='';if(save()){modal='';notify('Trip opened');scheduleWeather(true)}else render()}function newTrip(){let t={id:id(),name:'New trip',destination:'',start:'',end:'',people:[{id:id(),name:'Traveller 1'}],items:[],clothes:[],outfits:[]};db.trips.push(t);switchTrip(t.id);go('settings')}function duplicateTrip(){let t=structuredClone(trip());t.id=id();t.name+=' (copy)';t.items.forEach(x=>x.packed=false);db.trips.push(t);switchTrip(t.id)}function deleteTrip(i){if(db.trips.length<2)return alert('Keep at least one trip.');if(!confirm('Archive this trip? A backup will download first.'))return;exportData();db.trips=db.trips.filter(x=>x.id!==i);if(db.active===i)db.active=db.trips[0].id;save();render()}function exportData(){let b=new Blob([JSON.stringify(db,null,2)],{type:'application/json'}),a=document.createElement('a');a.href=URL.createObjectURL(b);a.download='dfs-packing-backup.json';a.click();URL.revokeObjectURL(a.href)}async function importData(el){let f=el.files[0];if(!f)return;try{let v=JSON.parse(await f.text());if(!Array.isArray(v.trips)||!v.trips.length)throw Error();if(confirm('Replace your existing trips with this backup?')){db=v;db.active=db.trips.some(t=>t.id===v.active)?v.active:db.trips[0].id;save();render()}}catch{alert('Invalid backup file')}}// Cruise Packer-inspired, reversible packing states and mobile-first cards.
+let packingView = 'active';
+
+function clothingPackingItem(clothingId) {
+  return trip().items.find(p => p.wardrobeId === clothingId && !p.deletedAt) || null;
+}
+
+function ensurePackingForClothing(c) {
+  const t = trip();
+  let p = clothingPackingItem(c.id);
+  if (!p) p = t.items.find(x => x.wardrobeId === c.id);
+  if (!p) {
+    const matching = t.items.filter(x => !x.deletedAt && !x.wardrobeId && x.owner === c.owner && x.qty === 1 && (x.category === 'Clothing' || x.category === 'Shoes') && x.name.trim().toLowerCase() === c.name.trim().toLowerCase());
+    if (matching.length === 1) {
+      p = matching[0];
+      p.wardrobeId = c.id;
+    }
+  }
+  if (!p) {
+    p = { id: id(), wardrobeId: c.id, name: c.name, owner: c.owner, category: 'Clothing', qty: 1, packed: false, notPacking: false };
+    t.items.push(p);
+  }
+  p.name = c.name;
+  p.owner = c.owner;
+  p.category = 'Clothing';
+  return p;
+}
+
+function setItemNotPacking(itemId, excluded) {
+  const p = trip().items.find(x => x.id === itemId && !x.deletedAt);
+  if (!p) return;
+  p.notPacking = excluded;
+  if (excluded) p.packed = false;
+  if (save()) notify(excluded ? 'Removed from checklist — you can bring it back anytime' : 'Added back to your packing list');
+  else render();
+}
+
+function setGarmentNotPacking(clothingId, excluded) {
+  const c = trip().clothes.find(x => x.id === clothingId && !x.deletedAt);
+  if (!c) return;
+  const p = ensurePackingForClothing(c);
+  delete p.deletedAt;
+  p.notPacking = excluded;
+  if (excluded) p.packed = false;
+  if (save()) notify(excluded ? 'Not packing — saved in your wardrobe' : 'Added to this trip’s packing list');
+  else render();
+}
+
+function toggleGarmentPacked(clothingId) {
+  const c = trip().clothes.find(x => x.id === clothingId && !x.deletedAt);
+  if (!c) return;
+  const p = ensurePackingForClothing(c);
+  delete p.deletedAt;
+  p.notPacking = false;
+  p.packed = !p.packed;
+  if (save()) notify(p.packed ? 'Marked as packed' : 'Marked as still to pack');
+  else render();
+}
+
+function packing() {
+  const all = scoped(trip().items);
+  const active = all.filter(x => !x.notPacking);
+  const excluded = all.filter(x => x.notPacking);
+  const showingExcluded = packingView === 'excluded';
+  const shown = showingExcluded ? excluded : active;
+  const packed = active.filter(x => x.packed).length;
+  return `${tabsPeople()}
+    <div class="section-head pack-heading"><div><h2>My packing list</h2><div class="muted">${packed} of ${active.length} packed · ${excluded.length} not packing</div></div>
+    <button class="btn" onclick="openModal('item')">+ Add item</button></div>
+    <div class="pack-switch" role="group" aria-label="Packing list view">
+      <button class="${!showingExcluded ? 'active' : ''}" aria-pressed="${!showingExcluded}" onclick="packingView='active';render()">Checklist <span>${active.length}</span></button>
+      <button class="${showingExcluded ? 'active' : ''}" aria-pressed="${showingExcluded}" onclick="packingView='excluded';render()">Not packing <span>${excluded.length}</span></button>
+    </div>
+    ${shown.length ? Object.keys(icons).map(cat => {
+      const entries = shown.filter(x => x.category === cat);
+      return entries.length ? `<section class="section pack-section"><div class="section-head"><h3>${icons[cat]} ${cat}</h3><span class="pill">${showingExcluded ? entries.length + ' saved' : entries.filter(x => x.packed).length + '/' + entries.length}</span></div><div class="items">${entries.map(x => `
+        <div class="item pack-item ${x.packed && !showingExcluded ? 'is-packed' : ''}">
+          ${showingExcluded ? '<span class="pack-paused" aria-hidden="true">−</span>' : `<button type="button" class="tick ${x.packed ? 'checked' : ''}" aria-label="${x.packed ? 'Mark unpacked' : 'Mark packed'}: ${esc(x.name)}" onclick="toggleItem('${x.id}')">${x.packed ? '✓' : ''}</button>`}
+          ${packingThumbnail(x)}
+          <button type="button" class="pack-details" onclick="openModal('item','${x.id}')" aria-label="Edit ${esc(x.name)}"><strong>${esc(x.name)}</strong><span>${esc(pName(x.owner))} · Qty ${x.qty || 1} · Edit</span></button>
+          <button type="button" class="pack-state-button ${showingExcluded ? 'restore' : ''}" onclick="setItemNotPacking('${x.id}',${!showingExcluded})">${showingExcluded ? 'Take it' : 'Don’t pack'}</button>
+        </div>`).join('')}</div></section>` : '';
+    }).join('') : `<div class="empty packing-empty"><strong>${showingExcluded ? 'Nothing left off your list' : 'Your checklist is clear'}</strong><p>${showingExcluded ? 'Tap “Don’t pack” on an item to keep it here without counting it towards packing.' : 'Add items or choose “Take it” from Not packing to bring clothes back.'}</p>${!showingExcluded ? '<button class="btn" onclick="addStarter()">Add starter essentials</button>' : ''}</div>`}
+    ${!showingExcluded ? '<div class="pack-footer"><button class="btn ghost" onclick="window.print()">Print checklist</button><button class="btn ghost" onclick="resetPacked()">Reset packed</button></div>' : ''}`;
+}
+
+function wardrobe() {
+  const all = scoped(trip().clothes);
+  const cats = ['All', ...clothingCategories, 'Clothing'];
+  const shown = all.filter(x => wardrobeCategory === 'All' || x.category === wardrobeCategory);
+  const excludedCount = all.filter(x => !clothingPackingItem(x.id) || clothingPackingItem(x.id).notPacking).length;
+  return `${tabsPeople(false)}
+    <div class="section-head wardrobe-heading"><div><h2>My wardrobe</h2><div class="muted">${all.length} pieces · ${excludedCount} not packing</div></div>
+    <button class="btn" onclick="openModal('clothing')">+ Add clothing</button></div>
+    <div class="wardrobe-filters">${cats.map(c => `<button class="filter ${wardrobeCategory === c ? 'active' : ''}" onclick="wardrobeCategory='${c}';render()">${c}</button>`).join('')}</div>
+    ${shown.length ? `<div class="wardrobe">${shown.map(c => {
+      const p = clothingPackingItem(c.id);
+      const excluded = !p || !!p.notPacking;
+      const status = excluded ? 'Not packing' : p.packed ? 'Packed' : 'To pack';
+      return `<article class="garment ${excluded ? 'garment-excluded' : ''}">
+        <button type="button" class="garment-img garment-photo-button" onclick="openWardrobePhoto('${c.id}')" aria-label="${c.photo ? 'Enlarge photo of' : 'Add photo to'} ${esc(c.name)}">
+          ${c.photo ? `<img loading="lazy" src="${esc(c.photo)}" alt="">` : `<span class="photo-placeholder"><span>${icons[c.category] || '👕'}</span><small>ADD PHOTO</small></span>`}
+          <span class="garment-chip">${esc(c.category)}</span><span class="garment-photo-hint">${c.photo ? 'View photo' : 'Add photo'}</span>
+        </button>
+        <div class="garment-body">
+          <div class="garment-title"><b>${esc(c.name)}</b><button type="button" onclick="openModal('clothing','${c.id}')" aria-label="Edit ${esc(c.name)}" title="Edit clothing">✎</button></div>
+          <small>${esc(pName(c.owner))}</small>
+          <span class="garment-status ${excluded ? 'status-excluded' : p.packed ? 'status-packed' : 'status-to-pack'}">${status}</span>
+          <div class="garment-actions">
+            ${excluded ? `<button type="button" class="garment-action-primary" onclick="setGarmentNotPacking('${c.id}',false)">Take it</button>` : `<button type="button" class="garment-action-primary" onclick="toggleGarmentPacked('${c.id}')">${p.packed ? 'Unpack' : 'Mark packed'}</button><button type="button" class="garment-action-secondary" onclick="setGarmentNotPacking('${c.id}',true)">Don’t pack</button>`}
+          </div>
+        </div>
+      </article>`;
+    }).join('')}</div>` : '<div class="empty"><strong>Start your wardrobe</strong><p>Add your clothes and their photos. Everything stays here even when you choose not to pack it.</p><button class="btn" onclick="openModal(\'clothing\')">+ Add clothing</button></div>'}`;
+}
+
+function showClothingPhoto(photo, name, garmentId = '') {
+  closePackingPhoto();
+  const overlay = document.createElement('div');
+  overlay.id = 'dfs-photo-viewer';
+  overlay.className = 'dfs-photo-viewer';
+  overlay.setAttribute('role', 'dialog');
+  overlay.setAttribute('aria-modal', 'true');
+  overlay.setAttribute('aria-label', 'Photo of ' + name);
+  overlay.innerHTML = '<div class="dfs-photo-viewer-content"><button type="button" class="dfs-photo-close" aria-label="Close photo">×</button><img alt=""><p></p>' + (garmentId ? '<button type="button" class="dfs-photo-edit">Edit clothing</button>' : '') + '</div>';
+  overlay.querySelector('img').src = photo;
+  overlay.querySelector('img').alt = name;
+  overlay.querySelector('p').textContent = name;
+  overlay.querySelector('.dfs-photo-close').addEventListener('click', closePackingPhoto);
+  overlay.addEventListener('click', e => { if (e.target === overlay) closePackingPhoto(); });
+  if (garmentId) overlay.querySelector('.dfs-photo-edit').addEventListener('click', () => { closePackingPhoto(); openModal('clothing', garmentId); });
+  document.body.appendChild(overlay);
+  document.addEventListener('keydown', packingPhotoEscape);
+  overlay.querySelector('.dfs-photo-close').focus();
+}
+
+function openPackingPhoto(itemId) {
+  const p = trip().items.find(x => x.id === itemId && !x.deletedAt);
+  if (!p) return;
+  const c = linkedGarment(p);
+  const photo = c?.photo || p.photo;
+  if (photo) showClothingPhoto(photo, p.name, c?.id || '');
+}
+
+function openWardrobePhoto(clothingId) {
+  const c = trip().clothes.find(x => x.id === clothingId && !x.deletedAt);
+  if (!c) return;
+  if (c.photo) showClothingPhoto(c.photo, c.name, c.id);
+  else openModal('clothing', c.id);
+}
+
+function deletePackingFromModal(itemId) {
+  if (!confirm('Move this item to Recently Deleted?')) return;
+  const p = trip().items.find(x => x.id === itemId);
+  if (!p) return;
+  p.deletedAt = new Date().toISOString();
+  modal = '';
+  if (save()) notify('Moved to Recently Deleted — restore in Trip setup');
+  else render();
+}
+
+function deleteClothingFromModal(clothingId) {
+  if (!confirm('Move this wardrobe item to Recently Deleted?')) return;
+  const c = trip().clothes.find(x => x.id === clothingId);
+  if (!c) return;
+  c.deletedAt = new Date().toISOString();
+  for (const p of trip().items.filter(x => x.wardrobeId === clothingId)) p.deletedAt = c.deletedAt;
+  modal = '';
+  if (save()) notify('Moved to Recently Deleted — restore in Trip setup');
+  else render();
+}
+render();scheduleWeather();
 </script></body></html>
